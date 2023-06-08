@@ -1,0 +1,23 @@
+{
+  "name": "benchmark-routers-for-react",
+  "version": "1.0.0",
+  "description": "Benchmark comparison of routers for React, tanstack router, react router 5, react router 6",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Rudolf Olah <rudolf.olah.to@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@tanstack/router": "0.0.1-beta.89",
+    "jsdom": "^22.1.0",
+    "react-router-dom5": "npm:react-router-dom@5.3.4",
+    "react-router-dom_6-4-0": "npm:react-router-dom@6.4.0",
+    "react-router-dom_6-5-0": "npm:react-router-dom@6.5.0",
+    "react-router-dom_6-6-0": "npm:react-router-dom@6.6.0",
+    "react-router-dom_6-6-3-pre.0": "npm:react-router-dom@6.6.3-pre.0",
+    "react-router-dom_6-12-0": "npm:react-router-dom@6.12.0",
+    "react-router5": "npm:react-router@5.3.4",
+    "react-router6": "npm:react-router@6.12.0"
+  }
+}
