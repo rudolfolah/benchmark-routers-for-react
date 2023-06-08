@@ -9,7 +9,7 @@ const tanstackRouter = require('@tanstack/router');
 // console.log(reactRouterDom5, reactRouterDom6, tanstackRouter);
 
 const WINDOW_LOCATION_HREF = 'https://localhost:3000';
-const TEST_RUNS = 300;
+const TEST_RUNS = 10000;
 
 global.Request = function Request() {};
 function setupDom() {
