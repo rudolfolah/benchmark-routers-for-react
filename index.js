@@ -44,18 +44,33 @@ async function benchmarkReactRouter6(reactRouterDom6Version) {
   const timeLabel = reactRouterDom6Version;
   // console.log(router.routes);
   
+  const datapoints = {};
+  datapoints[timeLabel + ', root'] = [];
+  datapoints[timeLabel + ', non-existent path'] = [];
   console.profile(timeLabel);
-  console.time(timeLabel + ': root');
+
   for (let i = 0; i < TEST_RUNS; i++) {
+    const start = Date.now();
     await router.navigate('/');
+    datapoints[timeLabel + ', root'].push(Date.now() - start);
   }
-  console.timeEnd(timeLabel + ': root');
-  console.time(timeLabel + ': non-existent path');
+
   for (let i = 0; i < TEST_RUNS; i++) {
+    const start = Date.now();
     await router.navigate('/does-not-exist');
+    datapoints[timeLabel + ', non-existent path'].push(Date.now() - start);
   }
-  console.timeEnd(timeLabel + ': non-existent path');
+
   console.profileEnd(timeLabel);
+
+  for (let key in datapoints) {
+    const avg = datapoints[key].reduce((a, b) => a + b) / datapoints[key].length;
+    const max = datapoints[key].reduce((a, b) => Math.max(a, b));
+    const min = datapoints[key].reduce((a, b) => Math.min(a, b));
+    console.log(`${key}, ${min}, ${avg}, ${max}`);
+  }
+
+  return datapoints;
 }
 
 async function benchmarkReactRouter5() {
@@ -90,6 +105,7 @@ async function benchmarkReactRouter5() {
   console.timeEnd('react-router-v5');
 }
 
+console.log('package_version, scenario, min_in_ms, avg_in_ms, max_in_ms');
 reactRouterDom6Versions.reduce((promise, reactRouterDom6Version) => {
   return promise.then(() => {
     return benchmarkReactRouter6(reactRouterDom6Version);
