@@ -7,7 +7,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: full-benchmark-${{ github.ref }}
+  # Results always land on the default branch, so serialize every publication.
+  group: full-benchmark
   cancel-in-progress: false
 
 jobs:
@@ -20,6 +21,10 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7.0.1
+        with:
+          # A manual run can be launched while viewing another branch. Always
+          # publish the canonical result and README link to the default branch.
+          ref: ${{ github.event.repository.default_branch }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v7.0.0
@@ -42,6 +47,25 @@ jobs:
           npm run --silent benchmark -- --format json > "$result_file"
           echo "timestamp=$timestamp" >> "$GITHUB_OUTPUT"
           echo "result_file=$result_file" >> "$GITHUB_OUTPUT"
+
+      - name: Validate benchmark output
+        env:
+          RESULT_FILE: ${{ steps.benchmark.outputs.result_file }}
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+
+          const results = JSON.parse(fs.readFileSync(process.env.RESULT_FILE, 'utf8'));
+          if (!Array.isArray(results) || results.length === 0) {
+            throw new Error('Benchmark output must be a non-empty JSON array');
+          }
+
+          for (const result of results) {
+            if (!result.router || !result.scenario || result.opsPerSecond <= 0) {
+              throw new Error(`Invalid benchmark result: ${JSON.stringify(result)}`);
+            }
+          }
+          NODE
 
       - name: Update latest-results link
         env:
