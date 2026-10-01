@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Node.js ${{ matrix.node-version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 20.19.0
+          - 22
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Smoke-test every router and scenario
+        run: npm run --silent benchmark:smoke -- --format json > benchmark-results.json
+
+      - name: Validate benchmark output
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const results = JSON.parse(fs.readFileSync('benchmark-results.json', 'utf8'));
+          const expectedResults = 6 * 5;
+
+          if (results.length !== expectedResults) {
+            throw new Error(`Expected ${expectedResults} results, received ${results.length}`);
+          }
+
+          for (const result of results) {
+            if (result.opsPerSecond <= 0 || result.medianMs < 0 || result.p95Ms < 0) {
+              throw new Error(`Invalid benchmark result: ${JSON.stringify(result)}`);
+            }
+          }
+          NODE
