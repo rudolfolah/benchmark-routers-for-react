@@ -82,3 +82,15 @@ Use `--warmup` to change the warm-up count; `--help` documents every option.
 
 For less noisy comparisons, close other CPU-heavy programs, keep the Node.js
 version and power settings fixed, and run multiple benchmark processes.
+
+## Automated benchmark results
+
+The [full benchmark workflow](./.github/workflows/benchmark.yml) runs every
+Monday at 06:00 UTC and can also be started manually. It commits the complete
+JSON output to the [`benchmark-results` directory](./benchmark-results/) with
+the UTC date and time in the file name, then refreshes the link below.
+
+<!-- benchmark-results:start -->
+Latest automated result: No result has been generated yet. Browse the
+[`benchmark-results` directory](./benchmark-results/) for available runs.
+<!-- benchmark-results:end -->

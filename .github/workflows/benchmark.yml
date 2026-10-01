@@ -1,0 +1,78 @@
+name: Full benchmark
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: full-benchmark-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  benchmark:
+    name: Run and publish benchmark
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run full benchmark
+        id: benchmark
+        shell: bash
+        run: |
+          timestamp="$(date -u +'%Y-%m-%dT%H-%M-%SZ')"
+          result_file="benchmark-results/benchmark-${timestamp}.json"
+          npm run --silent benchmark -- --format json > "$result_file"
+          echo "timestamp=$timestamp" >> "$GITHUB_OUTPUT"
+          echo "result_file=$result_file" >> "$GITHUB_OUTPUT"
+
+      - name: Update latest-results link
+        env:
+          RESULT_FILE: ${{ steps.benchmark.outputs.result_file }}
+          TIMESTAMP: ${{ steps.benchmark.outputs.timestamp }}
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+
+          const readmePath = 'README.md';
+          const readme = fs.readFileSync(readmePath, 'utf8');
+          const resultName = process.env.RESULT_FILE.split('/').pop();
+          const replacement = `<!-- benchmark-results:start -->\nLatest automated result: [\`${resultName}\`](./${process.env.RESULT_FILE}) (generated ${process.env.TIMESTAMP} UTC).\n<!-- benchmark-results:end -->`;
+          const updated = readme.replace(
+            /<!-- benchmark-results:start -->[\s\S]*?<!-- benchmark-results:end -->/,
+            replacement,
+          );
+
+          if (updated === readme) {
+            throw new Error('Could not find the benchmark results markers in README.md');
+          }
+          fs.writeFileSync(readmePath, updated);
+          NODE
+
+      - name: Commit benchmark result
+        env:
+          RESULT_FILE: ${{ steps.benchmark.outputs.result_file }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md "$RESULT_FILE"
+          git commit -m "Add benchmark results from $(basename "$RESULT_FILE" .json)"
+          git push
