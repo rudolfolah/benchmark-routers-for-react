@@ -1,114 +1,167 @@
-const jsdom = require('jsdom');
+#!/usr/bin/env node
 
-const packageJson = require('./package.json');
-const reactRouterDom6Versions = Object.keys(packageJson.devDependencies).filter((key) => key.startsWith('react-router-dom_6'));
-// randomize the order of reactRouterDom6Versions
-reactRouterDom6Versions.sort(() => Math.random() - 0.5);
+const { performance } = require('node:perf_hooks');
+const { loadRouters, ROUTE_PATHS } = require('./src/routers');
 
-const tanstackRouter = require('@tanstack/router');
-// console.log(reactRouterDom5, reactRouterDom6, tanstackRouter);
+const SCENARIOS = {
+  'static-first': '/a',
+  'static-middle': '/m',
+  'static-last': '/z',
+  dynamic: '/users/42',
+  'not-found': '/does-not-exist',
+};
 
-const WINDOW_LOCATION_HREF = 'https://localhost:3000';
-const TEST_RUNS = 10000;
+function usage() {
+  return `Usage: node index.js [options]
 
-global.Request = function Request() {};
-function setupDom() {
-  const { JSDOM } = jsdom;
-  const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>');
-  dom.reconfigure({ url: WINDOW_LOCATION_HREF });
-  const { window } = dom;
-  global.window = window;
-  global.document = window.document;
-  global.document.defaultView = dom.window;
-  global.navigator = {
-    userAgent: 'node.js',
+Options:
+  --routers <ids>     Comma-separated router IDs (default: all)
+  --scenarios <names> Comma-separated scenario names (default: all)
+  --runs <number>     Timed matches per sample (default: 10000)
+  --samples <number>  Number of samples (default: 5)
+  --warmup <number>   Untimed warm-up matches (default: 10000)
+  --format <table|json|csv> Output format (default: table)
+  --list              List available routers and scenarios
+  --help              Show this message
+
+Example:
+  npm start -- --routers react-router-v7,tanstack-router-v1 --runs 25000`;
+}
+
+function parsePositiveInteger(value, option) {
+  const number = Number(value);
+  if (!Number.isSafeInteger(number) || number < 1) {
+    throw new Error(`${option} must be a positive integer`);
+  }
+  return number;
+}
+
+function parseArgs(argv) {
+  const options = {
+    routers: null,
+    scenarios: null,
+    runs: 10000,
+    samples: 5,
+    warmup: 10000,
+    format: 'table',
+    list: false,
+    help: false,
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const option = argv[index];
+    if (option === '--help' || option === '-h') options.help = true;
+    else if (option === '--list') options.list = true;
+    else if (['--routers', '--scenarios', '--runs', '--samples', '--warmup', '--format'].includes(option)) {
+      const value = argv[index + 1];
+      if (!value || value.startsWith('--')) throw new Error(`${option} requires a value`);
+      index += 1;
+      if (option === '--routers') options.routers = value.split(',').filter(Boolean);
+      else if (option === '--scenarios') options.scenarios = value.split(',').filter(Boolean);
+      else if (option === '--format') options.format = value;
+      else options[option.slice(2)] = parsePositiveInteger(value, option);
+    } else {
+      throw new Error(`Unknown option: ${option}`);
+    }
+  }
+
+  if (!['table', 'json', 'csv'].includes(options.format)) {
+    throw new Error('--format must be table, json, or csv');
+  }
+  return options;
+}
+
+function select(items, requested, kind) {
+  if (!requested) return items;
+  const available = new Map(items.map((item) => [item.id || item, item]));
+  const unknown = requested.filter((id) => !available.has(id));
+  if (unknown.length) throw new Error(`Unknown ${kind}: ${unknown.join(', ')}`);
+  return requested.map((id) => available.get(id));
+}
+
+function percentile(values, fraction) {
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.ceil(sorted.length * fraction) - 1];
+}
+
+function benchmark(router, scenario, options) {
+  const path = SCENARIOS[scenario];
+  for (let index = 0; index < options.warmup; index += 1) router.match(path);
+
+  const samples = [];
+  let matches = 0;
+  for (let sample = 0; sample < options.samples; sample += 1) {
+    const start = performance.now();
+    for (let index = 0; index < options.runs; index += 1) {
+      if (router.match(path)) matches += 1;
+    }
+    samples.push(performance.now() - start);
+  }
+
+  const expectedMatches = scenario === 'not-found' ? 0 : options.runs * options.samples;
+  if (matches !== expectedMatches) {
+    throw new Error(`${router.id} returned an unexpected result for ${scenario}`);
+  }
+
+  const medianMs = percentile(samples, 0.5);
+  return {
+    router: router.id,
+    package: router.package,
+    version: router.version,
+    scenario,
+    routes: ROUTE_PATHS.length,
+    runsPerSample: options.runs,
+    samples: options.samples,
+    medianMs: Number(medianMs.toFixed(3)),
+    p95Ms: Number(percentile(samples, 0.95).toFixed(3)),
+    opsPerSecond: Math.round(options.runs / (medianMs / 1000)),
   };
 }
 
-async function benchmarkReactRouter6(reactRouterDom6Version) {
-  const reactRouterDom6 = require(reactRouterDom6Version);
-  setupDom();
-  const paths = "abcdefghijklmnopqrstuvwxyz".split("").map((letter) => {
-    return {
-      path: `/${letter}`,
-      element: jsdom.JSDOM.fragment(`<div>${letter}</div>`)
-    }
-  });
-  const router = reactRouterDom6.createBrowserRouter([
-    {
-      path: '/',
-      element: jsdom.JSDOM.fragment('<div>Root</div>')
-    },
-    ...paths
-  ]);
-  const timeLabel = reactRouterDom6Version;
-  // console.log(router.routes);
-  
-  const datapoints = {};
-  datapoints[timeLabel + ', root'] = [];
-  datapoints[timeLabel + ', non-existent path'] = [];
-  console.profile(timeLabel);
-
-  for (let i = 0; i < TEST_RUNS; i++) {
-    const start = Date.now();
-    await router.navigate('/');
-    datapoints[timeLabel + ', root'].push(Date.now() - start);
+function print(results, format) {
+  if (format === 'json') return console.log(JSON.stringify(results, null, 2));
+  if (format === 'csv') {
+    const keys = Object.keys(results[0]);
+    console.log(keys.join(','));
+    for (const result of results) console.log(keys.map((key) => result[key]).join(','));
+    return;
   }
-
-  for (let i = 0; i < TEST_RUNS; i++) {
-    const start = Date.now();
-    await router.navigate('/does-not-exist');
-    datapoints[timeLabel + ', non-existent path'].push(Date.now() - start);
-  }
-
-  console.profileEnd(timeLabel);
-
-  for (let key in datapoints) {
-    const avg = datapoints[key].reduce((a, b) => a + b) / datapoints[key].length;
-    const max = datapoints[key].reduce((a, b) => Math.max(a, b));
-    const min = datapoints[key].reduce((a, b) => Math.min(a, b));
-    console.log(`${key}, ${min}, ${avg}, ${max}`);
-  }
-
-  return datapoints;
+  console.table(results.map(({ router, version, scenario, medianMs, p95Ms, opsPerSecond }) => ({
+    router,
+    version,
+    scenario,
+    'median (ms)': medianMs,
+    'p95 (ms)': p95Ms,
+    'ops/sec': opsPerSecond,
+  })));
 }
 
-async function benchmarkReactRouter5() {
-  const React = require('react');
-  console.log("Benchmarking react router v5");
-  setupDom();
-  // when react router v5 is imported, it requires the global window and document createElement to exist upon import
-  const reactRouterDom5 = require('react-router-dom5');
-  const link = React.createElement(reactRouterDom5.Link, { to: '/' });
-  const route = React.createElement(reactRouterDom5.Route, {
-    path: '/',
-    element: jsdom.JSDOM.fragment('<div>Root</div>')
-  });
-  const _switch = React.createElement(reactRouterDom5.Switch, {
-    children: [route]
-  });
-  const router = React.createElement(reactRouterDom5.BrowserRouter, {
-    children: [link, _switch]
-  });
-  console.log(link);
-  console.time('react-router-v5');
-  for (let i = 0; i < TEST_RUNS; i++) {
-    /*
-    navigate: function navigate() {
-        var location = resolveToLocation(to, context.location);
-        var isDuplicateNavigation = history.createPath(context.location) === history.createPath(normalizeToLocation(location));
-        var method = replace || isDuplicateNavigation ? history$1.replace : history$1.push;
-        method(location);
-      }
-    */
+async function main(argv = process.argv.slice(2)) {
+  const options = parseArgs(argv);
+  if (options.help) return console.log(usage());
+
+  const routers = await loadRouters();
+  if (options.list) {
+    console.log('Routers:');
+    for (const router of routers) console.log(`  ${router.id} (${router.package} ${router.version})`);
+    console.log(`Scenarios:\n  ${Object.keys(SCENARIOS).join('\n  ')}`);
+    return;
   }
-  console.timeEnd('react-router-v5');
+
+  const selectedRouters = select(routers, options.routers, 'router');
+  const selectedScenarios = select(Object.keys(SCENARIOS), options.scenarios, 'scenario');
+  const results = [];
+  for (const router of selectedRouters) {
+    for (const scenario of selectedScenarios) results.push(benchmark(router, scenario, options));
+  }
+  print(results, options.format);
 }
 
-console.log('package_version, scenario, min_in_ms, avg_in_ms, max_in_ms');
-reactRouterDom6Versions.reduce((promise, reactRouterDom6Version) => {
-  return promise.then(() => {
-    return benchmarkReactRouter6(reactRouterDom6Version);
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(`Error: ${error.message}`);
+    process.exitCode = 1;
   });
-}, Promise.resolve());
-// benchmarkReactRouter5();
+}
+
+module.exports = { SCENARIOS, benchmark, parseArgs, select };

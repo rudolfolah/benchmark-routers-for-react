@@ -1,23 +1,29 @@
 {
   "name": "benchmark-routers-for-react",
   "version": "1.0.0",
-  "description": "Benchmark comparison of routers for React, tanstack router, react router 5, react router 6",
+  "description": "Reproducible route-matching benchmarks for current and legacy React routers",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "benchmark": "node index.js",
+    "benchmark:smoke": "node index.js --runs 100 --samples 2 --warmup 10",
+    "list": "node index.js --list",
+    "test": "node --test"
   },
   "author": "Rudolf Olah <rudolf.olah.to@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@tanstack/router": "0.0.1-beta.89",
-    "jsdom": "^22.1.0",
-    "react-router-dom5": "npm:react-router-dom@5.3.4",
-    "react-router-dom_6-4-0": "npm:react-router-dom@6.4.0",
-    "react-router-dom_6-5-0": "npm:react-router-dom@6.5.0",
-    "react-router-dom_6-6-0": "npm:react-router-dom@6.6.0",
-    "react-router-dom_6-6-3-pre.0": "npm:react-router-dom@6.6.3-pre.0",
-    "react-router-dom_6-12-0": "npm:react-router-dom@6.12.0",
-    "react-router5": "npm:react-router@5.3.4",
-    "react-router6": "npm:react-router@6.12.0"
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-v5": "npm:react-router@5.3.4",
+    "react-router-v6": "npm:react-router@6.30.6",
+    "react-router-v7": "npm:react-router@7.18.4",
+    "regexparam": "3.0.0",
+    "tanstack-router-v1": "npm:@tanstack/react-router@1.170.41",
+    "wouter-v2": "npm:wouter@2.12.1",
+    "wouter-v3": "npm:wouter@3.13.0"
+  },
+  "engines": {
+    "node": ">=20.19"
   }
 }
