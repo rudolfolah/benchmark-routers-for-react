@@ -68,10 +68,12 @@ jobs:
 
       - name: Commit benchmark result
         env:
+          COMMITTER_EMAIL: ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
+          COMMITTER_NAME: ${{ github.actor }}
           RESULT_FILE: ${{ steps.benchmark.outputs.result_file }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "$COMMITTER_NAME"
+          git config user.email "$COMMITTER_EMAIL"
           git add README.md "$RESULT_FILE"
           git commit -m "Add benchmark results from $(basename "$RESULT_FILE" .json)"
           git push
