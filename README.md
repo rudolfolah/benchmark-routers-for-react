@@ -85,10 +85,11 @@ version and power settings fixed, and run multiple benchmark processes.
 
 ## Automated benchmark results
 
-The [full benchmark workflow](./.github/workflows/benchmark.yml) runs every
-Monday at 06:00 UTC and can also be started manually. It commits the complete
-JSON output to the [`benchmark-results` directory](./benchmark-results/) with
-the UTC date and time in the file name, then refreshes the link below.
+The repository owner can manually start the [full benchmark
+workflow](./.github/workflows/benchmark.yml). It commits the complete JSON
+output to the [`benchmark-results` directory](./benchmark-results/) with the
+UTC date and time in the file name, then refreshes the link below. Runs started
+by any other actor are skipped.
 
 <!-- benchmark-results:start -->
 Latest automated result: No result has been generated yet. Browse the
