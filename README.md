@@ -92,6 +92,5 @@ UTC date and time in the file name, then refreshes the link below. Runs started
 by any other actor are skipped.
 
 <!-- benchmark-results:start -->
-Latest automated result: No result has been generated yet. Browse the
-[`benchmark-results` directory](./benchmark-results/) for available runs.
+Latest automated result: [`benchmark-2026-10-01T23-38-57Z.json`](./benchmark-results/benchmark-2026-10-01T23-38-57Z.json) (generated 2026-10-01T23-38-57Z UTC).
 <!-- benchmark-results:end -->
