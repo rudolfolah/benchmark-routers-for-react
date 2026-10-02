@@ -1,18 +1,21 @@
 # Benchmark for React Routers
 
 A reproducible route-matching benchmark for several generations of popular
-React routers. Package aliases allow incompatible major versions to be
-installed together and selected from the command line.
+React routers and routing engines commonly used by React applications. Package
+aliases allow incompatible major versions to be installed together and
+selected from the command line.
 
 ## Included routers
 
-The versions below were refreshed on **October 1, 2026**.
+The versions below were refreshed on **October 2, 2026**.
 
 | Benchmark ID | Package | Version | Why it is included |
 | --- | --- | ---: | --- |
 | `react-router-v5` | [`react-router`](https://v5.reactrouter.com/) | 5.3.4 | Last v5 release |
 | `react-router-v6` | [`react-router`](https://reactrouter.com/) | 6.30.6 | Maintained v6 line |
 | `react-router-v7` | [`react-router`](https://reactrouter.com/) | 7.18.4 | Current release |
+| `remix-router-v1` | [`@remix-run/router`](https://github.com/remix-run/react-router/tree/main/packages/react-router) | 1.23.4 | Framework-independent engine behind React Router 6 |
+| `router5-v8` | [`router5`](https://router5.js.org/) | 8.0.1 | Framework-independent router with React bindings |
 | `tanstack-router-v1` | [`@tanstack/react-router`](https://tanstack.com/router/latest) | 1.170.41 | Current release |
 | `wouter-v2` | [`wouter`](https://github.com/molefrog/wouter) | 2.12.1 | Previous major for comparison |
 | `wouter-v3` | [`wouter`](https://github.com/molefrog/wouter) | 3.13.0 | Current release |
@@ -23,13 +26,18 @@ repeatable. To refresh them, update the npm aliases in `package.json`, run
 
 ## What is measured
 
-Every adapter receives the same 27-route table: 26 static routes (`/a` through
-`/z`) and one dynamic route (`/users/:userId`). The benchmark measures the
-router's public matching API for:
+Every adapter receives the same 30-route table: 26 static routes (`/a` through
+`/z`), a deeply nested static route, a single-parameter route, a
+multiple-parameter route, and a wildcard route. Adapter-specific syntax is
+used where libraries spell parameters or wildcards differently. The benchmark
+measures the router's public matching API for:
 
 * first, middle, and last static routes;
-* a dynamic route with a parameter; and
-* a missing route.
+* a deeply nested static route;
+* dynamic routes with one and multiple parameters;
+* a multi-segment wildcard;
+* a partial dynamic-route near miss; and
+* a completely missing route.
 
 Each result reports the median and p95 elapsed time for a batch, plus operations
 per second derived from the median. Warm-up iterations run before timing. This

@@ -7,8 +7,8 @@ const { loadRouters } = require('../src/routers');
 test('all adapters agree on benchmark paths', async () => {
   const routers = await loadRouters();
   for (const router of routers) {
-    for (const [scenario, pathname] of Object.entries(SCENARIOS)) {
-      assert.equal(router.match(pathname), scenario !== 'not-found', `${router.id}: ${scenario}`);
+    for (const [scenario, { pathname, expected }] of Object.entries(SCENARIOS)) {
+      assert.equal(router.match(pathname), expected, `${router.id}: ${scenario}`);
     }
   }
 });

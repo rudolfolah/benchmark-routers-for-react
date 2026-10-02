@@ -13,12 +13,14 @@
   "author": "Rudolf Olah <rudolf.olah.to@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@remix-run/router": "1.23.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-v5": "npm:react-router@5.3.4",
     "react-router-v6": "npm:react-router@6.30.6",
     "react-router-v7": "npm:react-router@7.18.4",
     "regexparam": "3.0.0",
+    "router5": "8.0.1",
     "tanstack-router-v1": "npm:@tanstack/react-router@1.170.41",
     "wouter-v2": "npm:wouter@2.12.1",
     "wouter-v3": "npm:wouter@3.13.0"
