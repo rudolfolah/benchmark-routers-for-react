@@ -4,11 +4,15 @@ const { performance } = require('node:perf_hooks');
 const { loadRouters, ROUTE_PATHS } = require('./src/routers');
 
 const SCENARIOS = {
-  'static-first': '/a',
-  'static-middle': '/m',
-  'static-last': '/z',
-  dynamic: '/users/42',
-  'not-found': '/does-not-exist',
+  'static-first': { pathname: '/a', expected: true },
+  'static-middle': { pathname: '/m', expected: true },
+  'static-last': { pathname: '/z', expected: true },
+  'nested-static': { pathname: '/docs/guides/getting-started', expected: true },
+  dynamic: { pathname: '/users/42', expected: true },
+  'dynamic-multiple': { pathname: '/organizations/acme/projects/benchmark', expected: true },
+  wildcard: { pathname: '/files/reports/2026/october.csv', expected: true },
+  'near-miss': { pathname: '/organizations/acme/projects', expected: false },
+  'not-found': { pathname: '/does-not-exist', expected: false },
 };
 
 function usage() {
@@ -85,20 +89,20 @@ function percentile(values, fraction) {
 }
 
 function benchmark(router, scenario, options) {
-  const path = SCENARIOS[scenario];
-  for (let index = 0; index < options.warmup; index += 1) router.match(path);
+  const { pathname, expected } = SCENARIOS[scenario];
+  for (let index = 0; index < options.warmup; index += 1) router.match(pathname);
 
   const samples = [];
   let matches = 0;
   for (let sample = 0; sample < options.samples; sample += 1) {
     const start = performance.now();
     for (let index = 0; index < options.runs; index += 1) {
-      if (router.match(path)) matches += 1;
+      if (router.match(pathname)) matches += 1;
     }
     samples.push(performance.now() - start);
   }
 
-  const expectedMatches = scenario === 'not-found' ? 0 : options.runs * options.samples;
+  const expectedMatches = expected ? options.runs * options.samples : 0;
   if (matches !== expectedMatches) {
     throw new Error(`${router.id} returned an unexpected result for ${scenario}`);
   }

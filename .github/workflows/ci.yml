@@ -43,16 +43,41 @@ jobs:
         run: |
           node - <<'NODE'
           const fs = require('node:fs');
-          const results = JSON.parse(fs.readFileSync('benchmark-results.json', 'utf8'));
-          const expectedResults = 6 * 5;
+          const { SCENARIOS } = require('./index');
+          const { loadRouters, ROUTE_PATHS } = require('./src/routers');
 
-          if (results.length !== expectedResults) {
-            throw new Error(`Expected ${expectedResults} results, received ${results.length}`);
-          }
+          async function validate() {
+            const routers = await loadRouters();
+            const routerIds = new Set(routers.map(({ id }) => id));
+            const scenarioIds = new Set(Object.keys(SCENARIOS));
+            const expectedResults = routerIds.size * scenarioIds.size;
+            const results = JSON.parse(fs.readFileSync('benchmark-results.json', 'utf8'));
 
-          for (const result of results) {
-            if (result.opsPerSecond <= 0 || result.medianMs < 0 || result.p95Ms < 0) {
-              throw new Error(`Invalid benchmark result: ${JSON.stringify(result)}`);
+            if (results.length !== expectedResults) {
+              throw new Error(`Expected ${expectedResults} results, received ${results.length}`);
+            }
+
+            const combinations = new Set();
+            for (const result of results) {
+              if (!routerIds.has(result.router) || !scenarioIds.has(result.scenario)) {
+                throw new Error(`Unexpected benchmark combination: ${result.router}/${result.scenario}`);
+              }
+              if (result.routes !== ROUTE_PATHS.length) {
+                throw new Error(`Unexpected route count: ${JSON.stringify(result)}`);
+              }
+              if (result.opsPerSecond <= 0 || result.medianMs < 0 || result.p95Ms < 0) {
+                throw new Error(`Invalid benchmark result: ${JSON.stringify(result)}`);
+              }
+              combinations.add(`${result.router}:${result.scenario}`);
+            }
+
+            if (combinations.size !== expectedResults) {
+              throw new Error('Benchmark output contains duplicate or missing combinations');
             }
           }
+
+          validate().catch((error) => {
+            console.error(error);
+            process.exitCode = 1;
+          });
           NODE
