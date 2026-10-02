@@ -108,7 +108,7 @@ Chart labels are shortened for readability; `RR` means React Router, and the com
 ```mermaid
 xychart-beta
     title "Dynamic route median elapsed time"
-    x-axis ["RR v5", "RR v6", "RR v7", "remix-router-v1", "router5-v8", "TanStack v1", "Wouter v2", "Wouter v3"]
+    x-axis ["RR v5", "RR v6", "RR v7", "remix-v1", "router5-v8", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Milliseconds per sample"
     bar [156.907, 352.453, 692.15, 349.462, 501.257, 25.538, 11.301, 103.803]
 ```
@@ -116,7 +116,7 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Dynamic route p95 elapsed time"
-    x-axis ["RR v5", "RR v6", "RR v7", "remix-router-v1", "router5-v8", "TanStack v1", "Wouter v2", "Wouter v3"]
+    x-axis ["RR v5", "RR v6", "RR v7", "remix-v1", "router5-v8", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Milliseconds per sample"
     bar [158.256, 361.367, 695.838, 349.948, 501.482, 25.704, 11.382, 104.052]
 ```
@@ -124,7 +124,7 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Dynamic route matching throughput"
-    x-axis ["RR v5", "RR v6", "RR v7", "remix-router-v1", "router5-v8", "TanStack v1", "Wouter v2", "Wouter v3"]
+    x-axis ["RR v5", "RR v6", "RR v7", "remix-v1", "router5-v8", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Operations per second"
     bar [63732, 28373, 14448, 28615, 19950, 391571, 884899, 96336]
 ```

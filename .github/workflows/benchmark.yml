@@ -86,6 +86,7 @@ jobs:
 
           const chartLabel = (router) => router
             .replace(/^react-router-/, 'RR ')
+            .replace(/^remix-router-/, 'remix-')
             .replace(/^tanstack-router-/, 'TanStack ')
             .replace(/^wouter-/, 'Wouter ');
           const labels = dynamicResults
