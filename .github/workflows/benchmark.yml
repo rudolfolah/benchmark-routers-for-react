@@ -78,7 +78,67 @@ jobs:
           const readmePath = 'README.md';
           const readme = fs.readFileSync(readmePath, 'utf8');
           const resultName = process.env.RESULT_FILE.split('/').pop();
-          const replacement = `<!-- benchmark-results:start -->\nLatest automated result: [\`${resultName}\`](./${process.env.RESULT_FILE}) (generated ${process.env.TIMESTAMP} UTC).\n<!-- benchmark-results:end -->`;
+          const results = JSON.parse(fs.readFileSync(process.env.RESULT_FILE, 'utf8'));
+          const dynamicResults = results.filter(({ scenario }) => scenario === 'dynamic');
+          if (dynamicResults.length === 0) {
+            throw new Error('Cannot build the README chart without dynamic results');
+          }
+
+          const labels = dynamicResults.map(({ router }) => JSON.stringify(router)).join(', ');
+          const medians = dynamicResults.map(({ medianMs }) => medianMs).join(', ');
+          const p95s = dynamicResults.map(({ p95Ms }) => p95Ms).join(', ');
+          const operations = dynamicResults.map(({ opsPerSecond }) => opsPerSecond).join(', ');
+          const formatNumber = new Intl.NumberFormat('en-US').format;
+          const tableRows = results.map((result) => [
+            `\`${result.router}\``,
+            `\`${result.package}@${result.version}\``,
+            `\`${result.scenario}\``,
+            formatNumber(result.routes),
+            formatNumber(result.runsPerSample),
+            formatNumber(result.samples),
+            formatNumber(result.medianMs),
+            formatNumber(result.p95Ms),
+            formatNumber(result.opsPerSecond),
+          ].join(' | '));
+          const replacement = [
+            '<!-- benchmark-results:start -->',
+            `Latest automated result: [\`${resultName}\`](./${process.env.RESULT_FILE}) (generated ${process.env.TIMESTAMP} UTC).`,
+            '',
+            'The charts show every metric captured for dynamic-route matching. Lower is better for elapsed times; higher is better for throughput.',
+            '',
+            '```mermaid',
+            'xychart-beta',
+            '    title "Dynamic route median elapsed time"',
+            `    x-axis [${labels}]`,
+            '    y-axis "Milliseconds per sample"',
+            `    bar [${medians}]`,
+            '```',
+            '',
+            '```mermaid',
+            'xychart-beta',
+            '    title "Dynamic route p95 elapsed time"',
+            `    x-axis [${labels}]`,
+            '    y-axis "Milliseconds per sample"',
+            `    bar [${p95s}]`,
+            '```',
+            '',
+            '```mermaid',
+            'xychart-beta',
+            '    title "Dynamic route matching throughput"',
+            `    x-axis [${labels}]`,
+            '    y-axis "Operations per second"',
+            `    bar [${operations}]`,
+            '```',
+            '',
+            '### Complete results',
+            '',
+            'All captured metrics are shown below. Times are for one complete sample of the configured number of runs.',
+            '',
+            '| Router | Package version | Scenario | Routes | Runs / sample | Samples | Median (ms) | p95 (ms) | Operations / second |',
+            '| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |',
+            ...tableRows.map((row) => `| ${row} |`),
+            '<!-- benchmark-results:end -->',
+          ].join('\n');
           const updated = readme.replace(
             /<!-- benchmark-results:start -->[\s\S]*?<!-- benchmark-results:end -->/,
             replacement,
