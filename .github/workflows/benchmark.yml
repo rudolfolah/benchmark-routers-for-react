@@ -84,7 +84,13 @@ jobs:
             throw new Error('Cannot build the README chart without dynamic results');
           }
 
-          const labels = dynamicResults.map(({ router }) => JSON.stringify(router)).join(', ');
+          const chartLabel = (router) => router
+            .replace(/^react-router-/, 'RR ')
+            .replace(/^tanstack-router-/, 'TanStack ')
+            .replace(/^wouter-/, 'Wouter ');
+          const labels = dynamicResults
+            .map(({ router }) => JSON.stringify(chartLabel(router)))
+            .join(', ');
           const medians = dynamicResults.map(({ medianMs }) => medianMs).join(', ');
           const p95s = dynamicResults.map(({ p95Ms }) => p95Ms).join(', ');
           const operations = dynamicResults.map(({ opsPerSecond }) => opsPerSecond).join(', ');
@@ -105,6 +111,7 @@ jobs:
             `Latest automated result: [\`${resultName}\`](./${process.env.RESULT_FILE}) (generated ${process.env.TIMESTAMP} UTC).`,
             '',
             'The charts show every metric captured for dynamic-route matching. Lower is better for elapsed times; higher is better for throughput.',
+            'Chart labels are shortened for readability; `RR` means React Router, and the complete router IDs appear in the table.',
             '',
             '```mermaid',
             'xychart-beta',

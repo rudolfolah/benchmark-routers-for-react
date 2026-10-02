@@ -95,11 +95,12 @@ by any other actor are skipped.
 Latest automated result: [`benchmark-2026-10-01T23-38-57Z.json`](./benchmark-results/benchmark-2026-10-01T23-38-57Z.json) (generated 2026-10-01T23-38-57Z UTC).
 
 The charts show every metric captured for dynamic-route matching. Lower is better for elapsed times; higher is better for throughput.
+Chart labels are shortened for readability; `RR` means React Router, and the complete router IDs appear in the table.
 
 ```mermaid
 xychart-beta
     title "Dynamic route median elapsed time"
-    x-axis ["react-router-v5", "react-router-v6", "react-router-v7", "tanstack-router-v1", "wouter-v2", "wouter-v3"]
+    x-axis ["RR v5", "RR v6", "RR v7", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Milliseconds per sample"
     bar [223.617, 387.001, 812.703, 33.962, 13.714, 148.875]
 ```
@@ -107,7 +108,7 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Dynamic route p95 elapsed time"
-    x-axis ["react-router-v5", "react-router-v6", "react-router-v7", "tanstack-router-v1", "wouter-v2", "wouter-v3"]
+    x-axis ["RR v5", "RR v6", "RR v7", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Milliseconds per sample"
     bar [225.628, 392.058, 832.505, 34.233, 13.874, 149.774]
 ```
@@ -115,7 +116,7 @@ xychart-beta
 ```mermaid
 xychart-beta
     title "Dynamic route matching throughput"
-    x-axis ["react-router-v5", "react-router-v6", "react-router-v7", "tanstack-router-v1", "wouter-v2", "wouter-v3"]
+    x-axis ["RR v5", "RR v6", "RR v7", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Operations per second"
     bar [44719, 25840, 12305, 294448, 729207, 67170]
 ```
