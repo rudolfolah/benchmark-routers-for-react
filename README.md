@@ -92,7 +92,7 @@ UTC date and time in the file name, then refreshes the link below. Runs started
 by any other actor are skipped.
 
 <!-- benchmark-results:start -->
-Latest automated result: [`benchmark-2026-10-01T23-38-57Z.json`](./benchmark-results/benchmark-2026-10-01T23-38-57Z.json) (generated 2026-10-01T23-38-57Z UTC).
+Latest automated result: [`benchmark-2026-10-02T02-15-11Z.json`](./benchmark-results/benchmark-2026-10-02T02-15-11Z.json) (generated 2026-10-02T02-15-11Z UTC).
 
 The charts show every metric captured for dynamic-route matching. Lower is better for elapsed times; higher is better for throughput.
 Chart labels are shortened for readability; `RR` means React Router, and the complete router IDs appear in the table.
@@ -102,7 +102,7 @@ xychart-beta
     title "Dynamic route median elapsed time"
     x-axis ["RR v5", "RR v6", "RR v7", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Milliseconds per sample"
-    bar [223.617, 387.001, 812.703, 33.962, 13.714, 148.875]
+    bar [154.314, 293.396, 611.264, 25.842, 10.221, 98.308]
 ```
 
 ```mermaid
@@ -110,7 +110,7 @@ xychart-beta
     title "Dynamic route p95 elapsed time"
     x-axis ["RR v5", "RR v6", "RR v7", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Milliseconds per sample"
-    bar [225.628, 392.058, 832.505, 34.233, 13.874, 149.774]
+    bar [155.152, 293.838, 620.766, 25.989, 10.43, 100.818]
 ```
 
 ```mermaid
@@ -118,7 +118,7 @@ xychart-beta
     title "Dynamic route matching throughput"
     x-axis ["RR v5", "RR v6", "RR v7", "TanStack v1", "Wouter v2", "Wouter v3"]
     y-axis "Operations per second"
-    bar [44719, 25840, 12305, 294448, 729207, 67170]
+    bar [64803, 34084, 16360, 386968, 978356, 101721]
 ```
 
 ### Complete results
@@ -127,34 +127,34 @@ All captured metrics are shown below. Times are for one complete sample of the c
 
 | Router | Package version | Scenario | Routes | Runs / sample | Samples | Median (ms) | p95 (ms) | Operations / second |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `react-router-v5` | `react-router@5.3.4` | `static-first` | 27 | 10,000 | 5 | 10.056 | 10.708 | 994,416 |
-| `react-router-v5` | `react-router@5.3.4` | `static-middle` | 27 | 10,000 | 5 | 107.295 | 111.317 | 93,201 |
-| `react-router-v5` | `react-router@5.3.4` | `static-last` | 27 | 10,000 | 5 | 213.325 | 223.392 | 46,877 |
-| `react-router-v5` | `react-router@5.3.4` | `dynamic` | 27 | 10,000 | 5 | 223.617 | 225.628 | 44,719 |
-| `react-router-v5` | `react-router@5.3.4` | `not-found` | 27 | 10,000 | 5 | 220.717 | 255.894 | 45,307 |
-| `react-router-v6` | `react-router@6.30.6` | `static-first` | 27 | 10,000 | 5 | 401.328 | 404.284 | 24,917 |
-| `react-router-v6` | `react-router@6.30.6` | `static-middle` | 27 | 10,000 | 5 | 528.423 | 531.779 | 18,924 |
-| `react-router-v6` | `react-router@6.30.6` | `static-last` | 27 | 10,000 | 5 | 662.695 | 663.961 | 15,090 |
-| `react-router-v6` | `react-router@6.30.6` | `dynamic` | 27 | 10,000 | 5 | 387.001 | 392.058 | 25,840 |
-| `react-router-v6` | `react-router@6.30.6` | `not-found` | 27 | 10,000 | 5 | 652.682 | 655.847 | 15,321 |
-| `react-router-v7` | `react-router@7.18.4` | `static-first` | 27 | 10,000 | 5 | 801.26 | 803.026 | 12,480 |
-| `react-router-v7` | `react-router@7.18.4` | `static-middle` | 27 | 10,000 | 5 | 811.714 | 862.337 | 12,320 |
-| `react-router-v7` | `react-router@7.18.4` | `static-last` | 27 | 10,000 | 5 | 824.048 | 826.441 | 12,135 |
-| `react-router-v7` | `react-router@7.18.4` | `dynamic` | 27 | 10,000 | 5 | 812.703 | 832.505 | 12,305 |
-| `react-router-v7` | `react-router@7.18.4` | `not-found` | 27 | 10,000 | 5 | 817.814 | 824.122 | 12,228 |
-| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `static-first` | 27 | 10,000 | 5 | 16.426 | 16.803 | 608,773 |
-| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `static-middle` | 27 | 10,000 | 5 | 16.532 | 16.685 | 604,896 |
-| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `static-last` | 27 | 10,000 | 5 | 16.57 | 16.757 | 603,516 |
-| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `dynamic` | 27 | 10,000 | 5 | 33.962 | 34.233 | 294,448 |
-| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `not-found` | 27 | 10,000 | 5 | 8.514 | 8.7 | 1,174,515 |
-| `wouter-v2` | `wouter@2.12.1` | `static-first` | 27 | 10,000 | 5 | 0.526 | 1.205 | 19,009,455 |
-| `wouter-v2` | `wouter@2.12.1` | `static-middle` | 27 | 10,000 | 5 | 4.663 | 4.713 | 2,144,325 |
-| `wouter-v2` | `wouter@2.12.1` | `static-last` | 27 | 10,000 | 5 | 12.438 | 12.565 | 803,985 |
-| `wouter-v2` | `wouter@2.12.1` | `dynamic` | 27 | 10,000 | 5 | 13.714 | 13.874 | 729,207 |
-| `wouter-v2` | `wouter@2.12.1` | `not-found` | 27 | 10,000 | 5 | 11.979 | 12.219 | 834,811 |
-| `wouter-v3` | `wouter@3.13.0` | `static-first` | 27 | 10,000 | 5 | 5.29 | 5.495 | 1,890,401 |
-| `wouter-v3` | `wouter@3.13.0` | `static-middle` | 27 | 10,000 | 5 | 67.961 | 68.136 | 147,142 |
-| `wouter-v3` | `wouter@3.13.0` | `static-last` | 27 | 10,000 | 5 | 136.13 | 136.73 | 73,459 |
-| `wouter-v3` | `wouter@3.13.0` | `dynamic` | 27 | 10,000 | 5 | 148.875 | 149.774 | 67,170 |
-| `wouter-v3` | `wouter@3.13.0` | `not-found` | 27 | 10,000 | 5 | 144.575 | 145.406 | 69,168 |
+| `react-router-v5` | `react-router@5.3.4` | `static-first` | 27 | 10,000 | 5 | 6.604 | 7.655 | 1,514,192 |
+| `react-router-v5` | `react-router@5.3.4` | `static-middle` | 27 | 10,000 | 5 | 74.641 | 108.387 | 133,974 |
+| `react-router-v5` | `react-router@5.3.4` | `static-last` | 27 | 10,000 | 5 | 149.458 | 151.699 | 66,909 |
+| `react-router-v5` | `react-router@5.3.4` | `dynamic` | 27 | 10,000 | 5 | 154.314 | 155.152 | 64,803 |
+| `react-router-v5` | `react-router@5.3.4` | `not-found` | 27 | 10,000 | 5 | 153.831 | 154.047 | 65,007 |
+| `react-router-v6` | `react-router@6.30.6` | `static-first` | 27 | 10,000 | 5 | 300.715 | 304.092 | 33,254 |
+| `react-router-v6` | `react-router@6.30.6` | `static-middle` | 27 | 10,000 | 5 | 405.047 | 410.443 | 24,689 |
+| `react-router-v6` | `react-router@6.30.6` | `static-last` | 27 | 10,000 | 5 | 493.887 | 499.703 | 20,248 |
+| `react-router-v6` | `react-router@6.30.6` | `dynamic` | 27 | 10,000 | 5 | 293.396 | 293.838 | 34,084 |
+| `react-router-v6` | `react-router@6.30.6` | `not-found` | 27 | 10,000 | 5 | 481.52 | 482.17 | 20,768 |
+| `react-router-v7` | `react-router@7.18.4` | `static-first` | 27 | 10,000 | 5 | 606.237 | 607.485 | 16,495 |
+| `react-router-v7` | `react-router@7.18.4` | `static-middle` | 27 | 10,000 | 5 | 614.821 | 615.32 | 16,265 |
+| `react-router-v7` | `react-router@7.18.4` | `static-last` | 27 | 10,000 | 5 | 623.71 | 675.641 | 16,033 |
+| `react-router-v7` | `react-router@7.18.4` | `dynamic` | 27 | 10,000 | 5 | 611.264 | 620.766 | 16,360 |
+| `react-router-v7` | `react-router@7.18.4` | `not-found` | 27 | 10,000 | 5 | 617.968 | 618.983 | 16,182 |
+| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `static-first` | 27 | 10,000 | 5 | 12.316 | 12.497 | 811,928 |
+| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `static-middle` | 27 | 10,000 | 5 | 12.489 | 12.651 | 800,687 |
+| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `static-last` | 27 | 10,000 | 5 | 12.436 | 12.503 | 804,124 |
+| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `dynamic` | 27 | 10,000 | 5 | 25.842 | 25.989 | 386,968 |
+| `tanstack-router-v1` | `@tanstack/react-router@1.170.41` | `not-found` | 27 | 10,000 | 5 | 6.306 | 6.807 | 1,585,876 |
+| `wouter-v2` | `wouter@2.12.1` | `static-first` | 27 | 10,000 | 5 | 0.417 | 0.626 | 23,965,011 |
+| `wouter-v2` | `wouter@2.12.1` | `static-middle` | 27 | 10,000 | 5 | 3.663 | 3.702 | 2,729,938 |
+| `wouter-v2` | `wouter@2.12.1` | `static-last` | 27 | 10,000 | 5 | 8.908 | 9.181 | 1,122,624 |
+| `wouter-v2` | `wouter@2.12.1` | `dynamic` | 27 | 10,000 | 5 | 10.221 | 10.43 | 978,356 |
+| `wouter-v2` | `wouter@2.12.1` | `not-found` | 27 | 10,000 | 5 | 8.6 | 8.768 | 1,162,819 |
+| `wouter-v3` | `wouter@3.13.0` | `static-first` | 27 | 10,000 | 5 | 3.507 | 3.672 | 2,851,038 |
+| `wouter-v3` | `wouter@3.13.0` | `static-middle` | 27 | 10,000 | 5 | 48.822 | 49.097 | 204,826 |
+| `wouter-v3` | `wouter@3.13.0` | `static-last` | 27 | 10,000 | 5 | 91.626 | 98.688 | 109,140 |
+| `wouter-v3` | `wouter@3.13.0` | `dynamic` | 27 | 10,000 | 5 | 98.308 | 100.818 | 101,721 |
+| `wouter-v3` | `wouter@3.13.0` | `not-found` | 27 | 10,000 | 5 | 94.146 | 95.15 | 106,218 |
 <!-- benchmark-results:end -->
